@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: manujime <manujime@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/25 12:44:47 by manujime          #+#    #+#             */
-/*   Updated: 2022/11/14 15:57:54 by manujime         ###   ########.fr       */
+/*   Updated: 2022/11/14 13:57:21 by manujime         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 //reads the fd and put it's content int the buffer, if there is remainig
 //tex to process from previous calls it's joined to the new read result
 char	*ft_buffer_charger(int fd, char *buffer)
@@ -87,30 +87,21 @@ char	*ft_save_remaining(char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[257];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE < 1)
+	if (fd < 0 || BUFFER_SIZE < 1 || fd >= 257)
 	{
-		if (buffer)
-			free(buffer);
+		if (buffer[fd])
+			free(buffer[fd]);
 		return (NULL);
 	}
-	if (!buffer)
-		buffer = ft_calloc(1, 1);
-	buffer = ft_buffer_charger(fd, buffer);
-	if (!buffer)
+	if (!buffer[fd])
+		buffer[fd] = ft_calloc(1, 1);
+	buffer[fd] = ft_buffer_charger(fd, buffer[fd]);
+	if (!buffer[fd])
 		return (NULL);
-	line = ft_get_line(buffer);
-	buffer = ft_save_remaining(buffer);
+	line = ft_get_line(buffer[fd]);
+	buffer[fd] = ft_save_remaining(buffer[fd]);
 	return (line);
-}
-
-int	main(void)
-{
-	int	fd;
-
-	fd = open ("test.txt", O_RDONLY);
-	printf("1º line: %s", get_next_line(fd));
-	return (0);
 }
